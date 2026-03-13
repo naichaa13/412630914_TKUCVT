@@ -11,10 +11,10 @@
 
 | 項目 | VMware 設定值 | VM 內命令 | VM 內輸出 |
 |---|---|---|---|
-| CPU | 2 vCPU | `lscpu \| grep "^CPU(s)"` | （4） |
-| 記憶體 | 4 GB | `free -h \| grep Mem` | （3.8Gi） |
-| 磁碟 | 40 GB | `df -h /` | （50G） |
-| Hypervisor | VMware | `lscpu \| grep Hypervisor` | （vmware） |
+| CPU | 2 vCPU | `lscpu \| grep "^CPU(s)"` | 4 |
+| 記憶體 | 4 GB | `free -h \| grep Mem` | 3.8Gi |
+| 磁碟 | 40 GB | `df -h /` | 50G |
+| Hypervisor | VMware | `lscpu \| grep Hypervisor` | vmware |
 
 ## 四層驗收證據
 - [x] ① Repository：`cat /etc/apt/sources.list.d/docker.list` 輸出：deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.gpg]   https://download.docker.com/linux/ubuntu   noble stable
