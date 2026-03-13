@@ -43,18 +43,18 @@
 
 | 名稱 | 建立時機 | 用途說明 | 建立前驗證 |
 |---|---|---|---|
-| clean-baseline | （時間點） | （此節點代表的狀態） | （列出建點前做了哪些驗證） |
-| docker-ready | （時間點） | （此節點代表的狀態） | （列出建點前做了哪些驗證） |
+| clean-baseline | 16:28 | 原始乾淨基線，僅安裝 Docker 引擎 | hostnamectl、docker --version |
+| docker-ready | 17:25 | 開發就緒狀態，包含基礎映像檔 | sudo docker images、hello-world |
 
 ## 故障演練三階段對照
 
 | 項目 | 故障前（基線） | 故障中（注入後） | 回復後 |
 |---|---|---|---|
-| docker.list 存在 | 是 | 否 | （填入） |
-| apt-cache policy 有候選版本 | 是 | 否 | （填入） |
-| docker 重裝可行 | 是 | 否 | （填入） |
-| hello-world 成功 | 是 | N/A | （填入） |
-| nginx curl 成功 | 是 | N/A | （填入） |
+| docker.list 存在 | 是 | 否 | 是 |
+| apt-cache policy 有候選版本 | 是 | 否 | 是 |
+| docker 重裝可行 | 是 | 否 | 是 |
+| hello-world 成功 | 是 | N/A | 是 |
+| nginx curl 成功 | 是 | N/A | 是 |
 
 ## 手動修復 vs Snapshot 回復
 
@@ -65,9 +65,9 @@
 | 風險 | （你的判斷） | （你的判斷） |
 
 ## Snapshot 保留策略
-- 新增條件：
-- 保留上限：
-- 刪除條件：
+- 新增條件： 每次安裝新工具或大改設定前，且當前狀態已驗證通過時
+- 保留上限： 最多 3 個活躍 snapshot
+- 刪除條件： 已有更新節點且舊節點確認不再需要時，刪最舊的
 
 ## 最小可重現命令鏈
 （列出讓他人能重現故障注入與回復驗證的命令序列）
