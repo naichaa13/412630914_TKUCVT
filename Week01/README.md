@@ -7,6 +7,7 @@
 - Docker 版本：29.3.0
 - Docker Compose 版本：v5.1.0
 
+
 ## VM 資源配置驗證
 
 | 項目 | VMware 設定值 | VM 內命令 | VM 內輸出 |
@@ -22,11 +23,21 @@
 - [x] ③ Daemon：`sudo systemctl status docker` 顯示 active
 - [x] ④ 端到端：`sudo docker run hello-world` 成功輸出:Hello from Docker!
 - [x] Compose：`docker compose version` 可執行
+<img width="735" height="726" alt="Repository Engine Daemon" src="https://github.com/user-attachments/assets/c0ad1551-aaae-4bff-bacf-8f0d37e9ebd2" />
+<img width="654" height="531" alt="dockercompseversion" src="https://github.com/user-attachments/assets/2f0e751f-ad8b-457d-b5ad-c5f1f6c406cd" />
+<img width="732" height="586" alt="端到端" src="https://github.com/user-attachments/assets/cfb01100-a0fe-4549-a52b-28edfe4c0120" />
+
+
 
 ## 容器操作紀錄
 - [x] nginx：`sudo docker run -d -p 8080:80 nginx` + `curl localhost:8080` 輸出:Welcome to nginx!
+<img width="729" height="702" alt="wcnginx" src="https://github.com/user-attachments/assets/6be4d8e7-4c1f-42a4-bc3c-e3632ed31ec0" />
+
 - [x] alpine：`sudo docker run -it --rm alpine /bin/sh` 內部命令與輸出
+<img width="719" height="423" alt="alpine" src="https://github.com/user-attachments/assets/dfeda73b-5228-4918-b121-e4802ef8217f" />
+
 - [x] 映像列表：`sudo docker images` 輸出
+<img width="728" height="160" alt="dockerimages" src="https://github.com/user-attachments/assets/f0987774-33bb-46cd-ad84-1d702fe81f00" />
 
 ## Snapshot 清單
 
