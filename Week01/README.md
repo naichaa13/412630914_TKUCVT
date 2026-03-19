@@ -64,9 +64,17 @@
 
 | 面向 | 手動修復 | Snapshot 回復 |
 |---|---|---|
-| 所需時間 | （你的實測） | （你的實測） |
-| 適用情境 | （你的判斷） | （你的判斷） |
+| 所需時間 | 約1分鐘 | 約15秒 |
+| 適用情境 | 已知錯誤原因，且修改範圍極小時 | 系統損毀、無法開機、或不確定環境被改動了什麼 |
 | 風險 | （你的判斷） | （你的判斷） |
+
+### 故障與回復證據對照
+<img width="728" height="378" alt="故障中" src="https://github.com/user-attachments/assets/79f728d7-910e-4699-afff-ee675f2d9bea" />
+<img width="731" height="286" alt="再次注入故障" src="https://github.com/user-attachments/assets/d2baccd7-123c-4712-9a7a-1e7487d2f2d7" />
+ <img width="726" height="444" alt="回復後" src="https://github.com/user-attachments/assets/514d6dbc-a51c-4a9f-842f-64d728447062" />
+<img width="730" height="275" alt="回復後1" src="https://github.com/user-attachments/assets/0ea11af5-f8c3-44ca-87d2-fc0357346aae" />
+<img width="476" height="735" alt="snapshot" src="https://github.com/user-attachments/assets/ef74310a-285d-434d-bb86-b64ee8d95f2c" />
+
 
 ## Snapshot 保留策略
 - 新增條件： 每次安裝新工具或大改設定前，且當前狀態已驗證通過時
@@ -83,4 +91,10 @@
 - 驗證：（如何確認修正有效？）
 
 ## 設計決策
-（說明本週至少 1 個技術選擇與取捨）
+```bash
+# 故障注入
+sudo mv /etc/apt/sources.list.d/docker.list /etc/apt/sources.list.d/docker.list.broken && sudo apt update
+# 驗證故障 (應顯示找不到候選版本)
+apt-cache policy docker-ce | head -5
+# 回復驗證 (執行 Revert Snapshot 後)
+ls /etc/apt/sources.list.d/docker.list && sudo docker run --rm hello-world
