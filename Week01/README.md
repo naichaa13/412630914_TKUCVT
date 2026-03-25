@@ -82,13 +82,12 @@
 - 刪除條件： 已有更新節點且舊節點確認不再需要時，刪最舊的
 
 ## 最小可重現命令鏈
-```bash
-# 故障注入
-sudo mv /etc/apt/sources.list.d/docker.list /etc/apt/sources.list.d/docker.list.broken && sudo apt update
-# 驗證故障 (應顯示找不到候選版本)
+```
+ls /etc/apt/sources.list.d/
 apt-cache policy docker-ce | head -5
-# 回復驗證 (執行 Revert Snapshot 後)
-ls /etc/apt/sources.list.d/docker.list && sudo docker run --rm hello-world
+sudo systemctl status docker --no-pager
+sudo docker run --rm hello-world
+sudo docker images
 ```
 
 ## 排錯紀錄
