@@ -82,15 +82,6 @@
 - 刪除條件： 已有更新節點且舊節點確認不再需要時，刪最舊的
 
 ## 最小可重現命令鏈
-（列出讓他人能重現故障注入與回復驗證的命令序列）
-
-## 排錯紀錄
-- 症狀：
-- 診斷：（你首先查了什麼？）
-- 修正：（做了什麼改動？）
-- 驗證：（如何確認修正有效？）
-
-## 設計決策
 ```bash
 # 故障注入
 sudo mv /etc/apt/sources.list.d/docker.list /etc/apt/sources.list.d/docker.list.broken && sudo apt update
@@ -98,3 +89,13 @@ sudo mv /etc/apt/sources.list.d/docker.list /etc/apt/sources.list.d/docker.list.
 apt-cache policy docker-ce | head -5
 # 回復驗證 (執行 Revert Snapshot 後)
 ls /etc/apt/sources.list.d/docker.list && sudo docker run --rm hello-world
+```
+
+## 排錯紀錄
+- 症狀：回復快照後執行 Nginx 測試，curl 回傳 Connection reset by peer
+- 診斷：容器啟動瞬間服務尚未 Ready，立即連線導致 Reset
+- 修正：建議在自動化腳本中加入 sleep 等待容器完成初始化
+- 驗證：透過 docker ps 確認容器 Status 為 Up 後即可正常存取
+
+## 設計決策
+
