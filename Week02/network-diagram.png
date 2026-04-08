@@ -1,1 +1,19 @@
+graph LR
+    subgraph External
+        Internet((Internet))
+    end
 
+    subgraph VMware_Host
+        vSwitch8[[VMnet8 NAT]]
+        vSwitch1[[VMnet1 Host-only]]
+        
+        dev-a[dev-a 管理機]
+        server-b[server-b 伺服器]
+    end
+
+    dev-a --- vSwitch8
+    vSwitch8 --- Internet
+    dev-a -- 192.168.81.129 --- vSwitch1
+    server-b -- 192.168.81.128 --- vSwitch1
+    
+    dev-a -.->|SSH/SCP| server-b
