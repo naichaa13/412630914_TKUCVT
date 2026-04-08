@@ -42,7 +42,7 @@
 
 ## 網路拓樸圖
 （嵌入或連結 network-diagram.png）
-
+https://app.diagrams.net/#Hnaichaa13%2F412630914_TKUCVT%2Fmain%2FWeek02%2Fdiagram.png#%7B%22pageId%22%3A%223j2acr4erXuJKkKYMzo6%22%7D
 ## 排錯紀錄
 - 症狀：停止 SSH 服務後，ss -tlnp 仍看到 22 埠，且 dev-a 依然能連入
 - 診斷：查 systemctl status ssh 發現有 ssh.socket 正在觸發服務
