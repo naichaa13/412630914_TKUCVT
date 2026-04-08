@@ -8,6 +8,9 @@
 | dev-a | NIC 2 | Host-only | （192.168.81.129） | 內網互連 |
 | server-b | NIC 1 | Host-only | （192.168.81.128） | 內網互連 |
 
+![a-ip](a-ip.address.show.png)
+
+
 ## 連線驗證紀錄
 
 - [x] dev-a NAT 可上網：`ping google.com` 輸出
