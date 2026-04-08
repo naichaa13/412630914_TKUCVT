@@ -4,36 +4,41 @@
 
 | VM | 網卡 | 模式 | IP | 用途 |
 |---|---|---|---|---|
-| dev-a | NIC 1 | NAT | （填入） | 上網 |
-| dev-a | NIC 2 | Host-only | （填入） | 內網互連 |
-| server-b | NIC 1 | Host-only | （填入） | 內網互連 |
+| dev-a | NIC 1 | NAT | （192.168.81.129） | 上網 |
+| dev-a | NIC 2 | Host-only | （192.168.81.129） | 內網互連 |
+| server-b | NIC 1 | Host-only | （192.168.81.128） | 內網互連 |
 
 ## 連線驗證紀錄
 
-- [ ] dev-a NAT 可上網：`ping google.com` 輸出
-- [ ] 雙向互 ping 成功：貼上雙方 `ping` 輸出
-- [ ] SSH 連線成功：`ssh <user>@<ip> "hostname"` 輸出
-- [ ] SCP 傳檔成功：`cat /tmp/test-from-dev.txt` 在 server-b 上的輸出
-- [ ] server-b 不能上網：`ping 8.8.8.8` 失敗輸出
+- [x] dev-a NAT 可上網：`ping google.com` 輸出
+- [x] 雙向互 ping 成功：貼上雙方 `ping` 輸出
+- [x] SSH 連線成功：`ssh <user>@<ip> "hostname"` 輸出
+- [x] SCP 傳檔成功：`cat /tmp/test-from-dev.txt` 在 server-b 上的輸出
+- [x] server-b 不能上網：`ping 8.8.8.8` 失敗輸出
 
 ## 故障演練一：介面停用
 
 | 項目 | 故障前 | 故障中 | 回復後 |
 |---|---|---|---|
-| server-b 介面狀態 | UP | DOWN | （填入） |
-| dev-a ping server-b | 成功 | 失敗 | （填入） |
-| dev-a SSH server-b | 成功 | 失敗 | （填入） |
+| server-b 介面狀態 | UP | DOWN | UP, LOWER_UP |
+| dev-a ping server-b | 成功 | 失敗 | 成功 |
+| dev-a SSH server-b | 成功 | 失敗 | 成功 |
 
 ## 故障演練二：SSH 服務停止
 
 | 項目 | 故障前 | 故障中 | 回復後 |
 |---|---|---|---|
-| ss -tlnp grep :22 | 有監聽 | 無監聽 | （填入） |
-| dev-a ping server-b | 成功 | 成功 | （填入） |
-| dev-a SSH server-b | 成功 | Connection refused | （填入） |
+| ss -tlnp grep :22 | 有監聽 | 無監聽 | 空值 |
+| dev-a ping server-b | 成功 | 成功 | 成功 |
+| dev-a SSH server-b | 成功 | Connection refused | 成功 |
 
 ## 排錯順序
 （寫出你的 L2 → L3 → L4 排錯步驟與每層使用的命令）
+1.L2 (介面層)：先查 ip address show。如果介面不是 UP，連封包都發不出去。
+
+2.L3 (網路層)：再查 ip route 與 ping。確認路由表是否有路徑，以及對端是否可達。
+
+3.L4 (服務層)：最後查 ss -tlnp。如果 ping 通但連不上，通常是服務沒開或防火牆擋住。
 
 ## 網路拓樸圖
 （嵌入或連結 network-diagram.png）
