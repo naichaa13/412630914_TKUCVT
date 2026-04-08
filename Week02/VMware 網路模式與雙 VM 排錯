@@ -44,10 +44,10 @@
 （嵌入或連結 network-diagram.png）
 
 ## 排錯紀錄
-- 症狀：
-- 診斷：（你首先查了什麼？用了哪個命令？）
-- 修正：（做了什麼改動？）
-- 驗證：（如何確認修正有效？）
+- 症狀：停止 SSH 服務後，ss -tlnp 仍看到 22 埠，且 dev-a 依然能連入
+- 診斷：查 systemctl status ssh 發現有 ssh.socket 正在觸發服務
+- 修正：同時下指令 sudo systemctl stop ssh.service ssh.socket
+- 驗證：再次連線出現 Connection refused，確認故障注入成功
 
 ## 設計決策
 （說明本週至少 1 個技術選擇與取捨，例如：為什麼 server-b 只設 Host-only 不給 NAT？）
