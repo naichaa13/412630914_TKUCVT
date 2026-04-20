@@ -17,7 +17,7 @@
 - 拉取映像前 /var/lib/docker/ 大小：234K
 - 拉取映像後 /var/lib/docker/ 大小：240K
 
-![映像檔](./pic/磁碟使用量.png)
+![映像檔](./pic/磁碟前後對比.png)
 
 ## 權限結構
 
@@ -27,7 +27,8 @@
 - rw- (owner: root): root 使用者有完整讀寫權限。
 - rw- (group: docker): docker 群組成員可讀寫，藉此控制 Docker。
 - --- (others): 其他使用者完全無法存取，確保安全性
-- 
+![Docker Socket 權限解讀](./pic/解讀Docker_Socket權限.png)
+
 ### 使用者群組
 輸出：uid=1000(xjz) gid=1000(xjz) groups=1000(xjz),27(sudo),986(docker)...
 - 說明: 目前 xjz 已成功加入 docker 群組，具備免 sudo 操作 Docker 的權限
