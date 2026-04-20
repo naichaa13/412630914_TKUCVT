@@ -1,18 +1,18 @@
 # 期中實作 — <412630914> <許家禎>
 
 ## 1. 架構與 IP 表
-<Mermaid 圖 + 表格>
 ### IP 配置表
-| 機器名稱 (Hostname) | 網卡介面 | IP 位址 (IPv4) | 網路類型 | 用途說明 |
-| :--- | :--- | :--- | :--- | :--- |
-| **bastion** | `ens160` | `192.168.72.137` | NAT (External) | 外部入口：供本地端 (Host) 連線的唯一通道 |
-| **bastion** | `ens256` | `192.168.81.130` | Host-only (Internal) | **內部網關**：連向內網與 App 溝通的介面 |
-| **app** | `ens160` | `192.168.81.128` | Host-only (Internal) | **隔離服務區**：僅限內網存取，不對外開放 |
+| VM | 角色 | 網卡 | 模式 | IP | 
+|---|---|---|---|---|
+| bastion | 跳板機 | NIC 1 | NAT | 192.168.72.137 | 
+| bastion | 跳板機 | NIC 2 | Host-only | 192.168.81.130 | 
+| app | 應用層 | NIC 1 | Host-only | 192.168.81.128 | 
 
 ### Mermaid 圖
 ![Mermaid 圖](network-diagram.png)
 ## 2. Part A：VM 與網路
-<命令 + 關鍵輸出>
+- 在bastion執行 ping -c 3 192.168.81.128 (App) 成功
+- 在app執行 ping -c 3 192.168.81.130 (Bastion) 成功
 
 ## 3. Part B：金鑰、ufw、ProxyJump
 <防火牆規則表 + ssh app 成功證據>
