@@ -9,6 +9,7 @@
 | /usr/bin/docker | 使用者可執行檔 | Docker CLI 客戶端程式 |
 | /run/docker.sock | 執行期暫存（Unix Socket） | CLI 與 Daemon 通訊的管道（門戶） |
 
+![FHS](./pic/ls.png)
 ## Docker 系統資訊
 
 - Storage Driver：overlayfs (driver-type: io.containerd.snapshotter.v1)
