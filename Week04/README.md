@@ -17,6 +17,7 @@
 - 拉取映像前 /var/lib/docker/ 大小：234K
 - 拉取映像後 /var/lib/docker/ 大小：240K
 
+![映像檔](./pic/磁碟使用量.png)
 
 ## 權限結構
 
