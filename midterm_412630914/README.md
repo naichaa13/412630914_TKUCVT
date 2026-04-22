@@ -29,7 +29,7 @@
 | SSH | ALLOW | 192.168.81.130 | 22/tcp
 | Web API | ALLOW | 192.168.81.130 | 8080/tcp
 
-<img width="567" height="374" alt="appssh" src="https://github.com/user-attachments/assets/911097a6-36aa-475d-aa44-87f00d54271c" />
+![host](./screenshots/ssh-proxyjump.png)
 
 
 ## 4. Part C：Docker 服務
@@ -47,6 +47,11 @@
 - 回復後：在 app 執行 sudo ip link set ens160 up，連線恢復。
 - 診斷推論：由於 ip neigh顯示為 FAILED，代表封包在 L2 (數據鏈路層) 階段就因為找不到 MAC 地址而無法封裝。這證明了實體路徑已斷開，而非上層防火牆的攔截。
 
+![故障前](./screenshots/fault-A-before.png)
+![故障中](./screenshots/fault-A-during.png)
+![回復後](./screenshots/fault-A-after.png)
+
+
 ### 故障 2：<F3>
 - 注入方式：於 app 執行 sudo systemctl stop docker。
 - 故障前：bastion 執行 curl -I http://192.168.81.128:8080 回傳 200 OK。
@@ -58,6 +63,10 @@
   2.驗證程序：於 bastion 重新執行 curl -I http://192.168.81.128:8080。
   3。結果：錯誤訊息從原本的 Connection refused 變回 HTTP/1.1 200 OK，證實 Docker Daemon 重啟後，容器已恢復運作，且端到端通路恢復。
 - 診斷推論：與 F1 不同，F3 的 SSH 仍然通暢，且 curl 拿到的是 Connection refused。這代表網路層與防火牆規則。（L3/L4）均正常，封包成功抵達目標但因 port 8080 沒有Docker監聽而被拒絕，判定為服務層級故障。
+
+![故障前](./screenshots/fault-B-before.png)
+![故障中](./screenshots/fault-B-during.png)
+![回復後](./screenshots/fault-B-after.png)
 
 ### 症狀辨識（若選 F1+F2 必答）
 兩個都 timeout，我怎麼分？
