@@ -1,3 +1,4 @@
+<img width="517" height="269" alt="bpinga" src="https://github.com/user-attachments/assets/dffcfe50-0878-4538-b82d-cdc7bc6a088d" />
 # 期中實作 — <412630914> <許家禎>
 
 ## 1. 架構與 IP 表
@@ -12,6 +13,8 @@
 ## 2. Part A：VM 與網路
 - 在bastion執行 ping -c 3 192.168.81.128 (App) 成功
 - 在app執行 ping -c 3 192.168.81.130 (Bastion) 成功
+<img width="517" height="269" alt="bpinga" src="https://github.com/user-attachments/assets/7277fe48-bee5-40bb-8ffa-d678367c5e08" />
+<img width="522" height="224" alt="apingb" src="https://github.com/user-attachments/assets/bcd0d7c0-3b1e-4587-8618-74fb2a735b29" />
 
 ## 3. Part B：金鑰、ufw、ProxyJump
 <防火牆規則表 + ssh app 成功證據>
