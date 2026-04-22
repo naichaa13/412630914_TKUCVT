@@ -1,4 +1,3 @@
-<img width="517" height="269" alt="bpinga" src="https://github.com/user-attachments/assets/dffcfe50-0878-4538-b82d-cdc7bc6a088d" />
 # 期中實作 — <412630914> <許家禎>
 
 ## 1. 架構與 IP 表
