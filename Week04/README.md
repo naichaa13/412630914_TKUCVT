@@ -59,7 +59,7 @@ Main PID: 1456 (dockerd)
 - Daemon (dockerd): 真正的工廠老闆，負責管理容器運作
 - 為什麼 docker --version 正常不代表可用？ 因為版本查詢只需 CLI 檔案存在即可，不需連接到後台 Daemon。要確認可用必須執行 docker ps 等涉及通訊的指令
 
-![差異](./pic/HostvsContainer.png)
+![差異](./pic/HostvsContainer視角.png)
 
 ## 環境變數
 
@@ -79,7 +79,7 @@ Main PID: 1456 (dockerd)
 | docker ps | 正常 | Cannot connect | 正常  |
 | ps aux grep dockerd | 有 process | 無 process | 有新 PID process |
 
-![故障前](./pic/故障前基線)
+![故障前](./pic/故障前基線.png)
 ![故障注入](./pic/故障注入.png)
 ![回復後驗證](./pic/回復後驗證.png)
 
