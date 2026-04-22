@@ -57,7 +57,7 @@
 - 故障前：bastion 執行 curl -I http://192.168.81.128:8080 回傳 200 OK。
 - 故障中：
   1.host 執行 ssh app 依然可以連線
-  2。bastion 執行 curl 出現 curl: (7) Failed to connect... Connection refused
+  2.bastion 執行 curl 出現 curl: (7) Failed to connect... Connection refused
 - 回復後：
   1.於 app 執行 sudo systemctl start docker。
   2.驗證程序：於 bastion 重新執行 curl -I http://192.168.81.128:8080。
