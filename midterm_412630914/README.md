@@ -2,11 +2,10 @@
 
 ## 1. 架構與 IP 表
 ### IP 配置表
-| VM | 角色 | 網卡 | 模式 | IP | 
+| VM | 角色 | NAT | Host-only | 備註
 |---|---|---|---|---|
-| bastion | 跳板機 | NIC 1 | NAT | 192.168.72.137 | 
-| bastion | 跳板機 | NIC 2 | Host-only | 192.168.81.130 | 
-| app | 應用層 | NIC 1 | Host-only | 192.168.81.128 | 
+| bastion | 跳板機 | 192.168.72.137| 192.168.81.130 | 唯一對外入口 
+| app | 應用層 | N/A | 192.168.81.128 | 無外網，僅限內網訪問 
 
 ### Mermaid 圖
 ![Mermaid 圖](network-diagram.png)
