@@ -17,7 +17,19 @@
 
 ## 3. Part B：金鑰、ufw、ProxyJump
 <防火牆規則表 + ssh app 成功證據>
+### Bastion
+|規則項目| Action | From | To
+|---|---|---|---|
+| Default | DENY | Anywhere| Anywhere  
+| SSH | ALLOW | Anywhere | Port 22/tcp
+### app
+|規則項目| Action | From | To
+|---|---|---|---|
+| Default | DENY | Anywhere| Anywhere  
+| SSH | ALLOW | 192.168.81.130 | Port 22/tcp
+| Web API | ALLOW | 192.168.81.130 | Port 8080/tcp
 
+<img width="567" height="374" alt="appssh" src="https://github.com/user-attachments/assets/911097a6-36aa-475d-aa44-87f00d54271c" />
 
 
 ## 4. Part C：Docker 服務
