@@ -67,10 +67,14 @@
   1.host 執行 ssh app 依然可以連線
   2.bastion 執行 curl 出現 curl: (7) Failed to connect... Connection refused
 - 回復後：
+- 
   1.於 app 執行 sudo systemctl start docker。
+  
   2.檢查容器狀態:sudo docker ps -a ->手動喚醒容器:sudo docker start web ->驗證監聽:ss -tlnp | grep :8080
-  2.驗證程序：於 bastion 重新執行 curl -I http://192.168.81.128:8080。
-  3。結果：錯誤訊息從原本的 Connection refused 變回 HTTP/1.1 200 OK，證實 Docker Daemon 重啟後，容器已恢復運作，且端到端通路恢復。
+
+  3.驗證程序：於 bastion 重新執行 curl -I http://192.168.81.128:8080。
+
+  4.結果：錯誤訊息從原本的 Connection refused 變回 HTTP/1.1 200 OK，證實 Docker Daemon 重啟後，容器已恢復運作，且端到端通路恢復。
 - 診斷推論：與 F1 不同，F3 的 SSH 仍然通暢，且 curl 拿到的是 Connection refused。這代表網路層與防火牆規則。（L3/L4）均正常，封包成功抵達目標但因 port 8080 沒有Docker監聽而被拒絕，判定為服務層級故障。
 
 **故障前**
