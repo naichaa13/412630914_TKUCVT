@@ -67,7 +67,7 @@
   1.host 執行 ssh app 依然可以連線
   2.bastion 執行 curl 出現 curl: (7) Failed to connect... Connection refused
 - 回復後：
-- 
+  
   1.於 app 執行 sudo systemctl start docker。
   
   2.檢查容器狀態:sudo docker ps -a ->手動喚醒容器:sudo docker start web ->驗證監聽:ss -tlnp | grep :8080
