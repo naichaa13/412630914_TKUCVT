@@ -70,7 +70,7 @@
   
   1.於 app 執行 sudo systemctl start docker。
   
-  2.檢查容器狀態:sudo docker ps -a ->手動喚醒容器:sudo docker start web ->驗證監聽:ss -tlnp | grep :8080
+  2.檢查容器狀態:sudo docker ps -a ->手動喚醒容器:sudo docker start web ->驗證監聽:ss -tlnp | grep :8080。
 
   3.驗證程序：於 bastion 重新執行 curl -I http://192.168.81.128:8080。
 
