@@ -2,10 +2,10 @@
 
 ## Docker 環境
 
-- Storage Driver：（貼上）
-- Cgroup Version：（貼上）
-- Cgroup Driver：（貼上）
-- Default Runtime：（貼上）
+- Storage Driver：overlayfs
+- Cgroup Version：systemd
+- Cgroup Driver：2
+- Default Runtime：runc
 
 ## Namespace 觀察
 
