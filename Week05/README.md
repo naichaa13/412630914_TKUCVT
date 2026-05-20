@@ -7,7 +7,9 @@
 - **Cgroup Driver:** systemd
 - **Default Runtime:** runc
 
----
+
+<img width="505" height="67" alt="Docker環境" src="https://github.com/user-attachments/assets/2a65be06-ef0a-4bc3-9914-9c4500d42dba" />
+
 
 ## Namespace 觀察
 
@@ -31,11 +33,12 @@
 | **ipc** | `4026531839` | `4026532913` | **不一樣 (核心隔離)** |
 | **user** | `4026531837` | `4026531837` | **一樣 (預設未開啟)** |
 
+<img width="405" height="308" alt="Namespace" src="https://github.com/user-attachments/assets/0dba4ef3-0061-402c-a505-d19ca541dc63" />
+
+
 ### 容器內 `ps aux` 觀察
 在容器內執行 `ps aux | wc -l` 僅顯示 **5** 條紀錄。
 *   **原因：** 這是 PID Namespace 隔離產生的視角截斷效果。容器內的 `sleep 3600` 行程在該隔離區間內被賦予了 **PID 1**（Init）的特殊身份，無法看到 Host 上其他上百個正在執行的常規行程。而在 Host 視角看，該行程僅是常規的普通行程（實體 PID = `20954`）。
-
----
 
 ## Cgroups 實驗
 
@@ -50,6 +53,10 @@
     - `cpu.max`: `50000 100000`
     - `memory.current`: 於測試時某瞬間讀取為 `348160` Bytes。
 
+<img width="331" height="63" alt="Cgroups2" src="https://github.com/user-attachments/assets/9690c456-f5c0-4184-8a0c-249ac036b337" />
+<img width="616" height="32" alt="Cgroups" src="https://github.com/user-attachments/assets/38dad3d8-2a4b-4cee-b411-a17a5284ec09" />
+
+
 ### OOM 故障注入三階段證據
 
 | 項目 | 故障前 | 故障中（memory=32m + dd 200m）| 回復後（memory=256m）|
@@ -60,7 +67,9 @@
 
 > 💡 **註：** 於回復後實驗中，容器未引發 Cgroup OOM，但因 App VM 配置之實體記憶體較小，觸及了 `/dev/shm` (tmpfs) 的實體容量上限，噴出 `No space left on device`。此為實體硬體邊界限制，非 Cgroup 掐死。
 
----
+<img width="695" height="354" alt="OOMKill2" src="https://github.com/user-attachments/assets/871909b2-d6e6-4c3c-a616-5e920822b4ae" />
+<img width="693" height="418" alt="OOMKill" src="https://github.com/user-attachments/assets/9e9ede64-a52b-443c-a346-ba65cc694501" />
+
 
 ## Image 分層
 
@@ -85,6 +94,9 @@ A /tmp/hello.txt
 - **`C` (Changed):** 變更。例如 `/etc`、`/tmp` 等目錄。因為其底下的子檔案或目錄結構被修改、新增或刪除，導致目錄的元數據（Metadata）或內容發生變化。
 - **`D` (Deleted):** 刪除。例如 `/etc/nginx/conf.d/default.conf`。這體現了 **Copy-on-Write (CoW)** 的白頭翁（Whiteout）機制——底層鏡像中的該檔案其實完好無損，Docker 只是在可寫層放了一個特殊標記，告訴容器的掛載視圖（Merged）隱藏此檔案，營造出「已被刪除」的假象。
 
+<img width="328" height="98" alt="Copy-on-Write" src="https://github.com/user-attachments/assets/68d494e6-0ff5-44f7-83bb-3d06856a96b7" />
+
+
 ## OCI 呼叫鏈
 
 （用自己的話說明 dockerd → containerd → containerd-shim → runc 各自負責什麼，以及 OCI Runtime Spec `config.json` 裡哪些欄位對應到 namespace / cgroup 設定）
@@ -99,6 +111,8 @@ A /tmp/hello.txt
 在 OCI Runtime Spec 的 `config.json` 中：
 - **Namespace 對應：** 位於 `"linux.namespaces"` 陣列欄位。裡面明確指定了 `"type": "pid"`、`"type": "network"`、`"type": "mount"` 等項目，這直接指導了 `runc` 在啟動時要幫 Process 隔離出哪些系統視角。
 - **Cgroup 對應：** 位於 `"linux.resources"` 欄位。底下的 `"memory": { "limit": 268435456 }` 和 `"cpu": { "quota": 50000, "period": 100000 }`，直接對應並決定了 `runc` 要往主機的 `/sys/fs/cgroup/` 實體檔案系統裡寫入什麼限制值。
+
+<img width="432" height="482" alt="OCI" src="https://github.com/user-attachments/assets/4eeca5e6-587e-49bb-8897-9fdd46607eb0" />
 
 
 ## 排錯紀錄
