@@ -27,7 +27,7 @@ json
 ## Layer 快取實驗
 | 情境 | build 時間 |
 |---|---|
-| v1 首次 build | 5.747s |
+| v1 首次 build | 5.474s |
 | v1 改 app.py 後 rebuild | 4.996s (RUN pip install 耗時 4.3s) |
 | v2 首次 build | 5.063s (RUN pip install 耗時 4.3s） |
 | v2 改 app.py 後 rebuild | 0.211s (CACHED) |
@@ -37,6 +37,7 @@ json
 v1 的反模式：將時常變動的 COPY app/ . 放在 RUN pip install 之前。當 app.py 透過 sed 改動一行，COPY 層判定 miss，害得後面最耗時的 pip install 每次都要重跑（耗時 4.3 秒）。
 v2 的最佳實踐：將不容易變動的 requirements.txt 獨立出來優先 COPY 并執行 pip install。由於相依清單沒變，這兩層會牢牢鎖在 CACHED 中。後續修改 app.py 時，只會觸發最後一層 COPY app/ . 的重算，因此 rebuild 只要 0.211 秒。
 
+<img width="685" height="288" alt="截圖 2026-05-27 16 59 52" src="https://github.com/user-attachments/assets/0bd086b3-3d02-4239-856b-737148b7c9be" />
 <img width="683" height="299" alt="截圖 2026-05-27 16 47 37" src="https://github.com/user-attachments/assets/f1499b0e-fd03-490b-b1be-c3f91d21aa7e" />
 <img width="692" height="617" alt="截圖 2026-05-27 16 48 34" src="https://github.com/user-attachments/assets/32f55dee-fcbf-48ea-be7b-3760ea677031" />
 
