@@ -20,6 +20,7 @@ json
 ```
 - Config.WorkingDir：“”
 - RootFS.Layers 數量：4
+<img width="507" height="595" alt="截圖 2026-05-27 16 41 26" src="https://github.com/user-attachments/assets/00e796f0-a157-4cd1-a91f-49c063ac5f09" />
 
 
 
@@ -35,6 +36,10 @@ json
 - 在 Docker 的快取機制中，遵循「某層 Miss 則其後全 Miss」的嚴格規則。只要任何一層 Layer 因為檔案變動或指令修改導致快取失效，其後續的所有 Dockerfile 指令都必須放棄快取、強迫重新執行。
 v1 的反模式：將時常變動的 COPY app/ . 放在 RUN pip install 之前。當 app.py 透過 sed 改動一行，COPY 層判定 miss，害得後面最耗時的 pip install 每次都要重跑（耗時 4.3 秒）。
 v2 的最佳實踐：將不容易變動的 requirements.txt 獨立出來優先 COPY 并執行 pip install。由於相依清單沒變，這兩層會牢牢鎖在 CACHED 中。後續修改 app.py 時，只會觸發最後一層 COPY app/ . 的重算，因此 rebuild 只要 0.211 秒。
+
+<img width="683" height="299" alt="截圖 2026-05-27 16 47 37" src="https://github.com/user-attachments/assets/f1499b0e-fd03-490b-b1be-c3f91d21aa7e" />
+<img width="692" height="617" alt="截圖 2026-05-27 16 48 34" src="https://github.com/user-attachments/assets/32f55dee-fcbf-48ea-be7b-3760ea677031" />
+
 
 ## CMD vs ENTRYPOINT 實驗
 | 寫法 | `docker run <img>` 輸出 | `docker run <img> extra1 extra2` 輸出 |
@@ -58,6 +63,8 @@ PID = 1 (成功覆蓋預設引數) |
 - Exec Form 的覆蓋特性：在 docker run 後方帶參數時，如果是 CMD 寫法，參數會整條取代原本的陣列，導致 Docker 誤將 extra1 當成指令執行而報錯。
 - 最佳搭配：用 ENTRYPOINT 固定不變的主程式，用 CMD 存放彈性預設參數。外傳參數能完美取代 CMD 並當成引數傳遞（如實測成功印出 extra1 與 extra2），最適合開發 CLI 彈性工具。
 
+<img width="688" height="244" alt="截圖 2026-05-27 16 51 01" src="https://github.com/user-attachments/assets/5e2ca82c-7129-4b0b-bec6-3f4c31223ad1" />
+
 ## Multi-stage 大小對照
 | Image | SIZE |
 |---|---|
@@ -77,6 +84,10 @@ PID = 1 (成功覆蓋預設引數) |
 | build context 傳輸大小 | 129B | 151 MB | 129B |
 | build 時間 | <0.5s |8.331s） | 2.071s |
 
+<img width="382" height="167" alt="截圖 2026-05-27 16 53 10" src="https://github.com/user-attachments/assets/0c5264bd-823c-421b-a79e-185c8bccaa39" />
+<img width="690" height="505" alt="截圖 2026-05-27 16 53 47" src="https://github.com/user-attachments/assets/dc1c179a-5e91-4f63-938f-23b9f3995282" />
+<img width="693" height="419" alt="截圖 2026-05-27 16 53 57" src="https://github.com/user-attachments/assets/abaec974-c2b7-4dc2-9e4a-d060de4c3b52" />
+
 ## 排錯紀錄
 - 症狀：多階段建置（myapp:multi）容器啟動後，執行 curl http://localhost:8081/ 遭遇 Connection reset by peer
 - 診斷：
@@ -87,6 +98,9 @@ PID = 1 (成功覆蓋預設引數) |
   3.第一次執行 docker run --name myapp-multi 時，因為忘記清理上一次實驗殘留的舊容器，導致新容器命名衝    突、根本沒有建立成功。此時發送 curl 戳到的是正在初始化（還沒完全醒過來）的舊容器，因而被網路層丟出重置訊號（Connection Reset）。
 - 修正：先明確執行 docker stop myapp-multi && docker rm myapp-multi 徹底清理乾淨。接著不帶任何尾隨參數（避免覆蓋路徑）進行乾淨啟動，並靜候 1 秒
 - 驗證：重新執行後，curl http://localhost:8081/ 完美噴出 Hey from d71a3b82b205 | version=multi，且透過 whoami 證實容器是以安全、限權的非 Root 使用者 appuser 在背景運行。
+
+
+
 
 ## 設計決策
 （說明本週至少 1 個技術選擇與取捨，例如：為什麼 runtime 選 `python:3.12-slim` 而不是 `alpine`？）
