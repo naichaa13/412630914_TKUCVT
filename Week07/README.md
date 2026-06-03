@@ -9,6 +9,7 @@
 
 ## 從 docker run 到 compose.yaml
 （自己的話：你最有感的一個改善是什麼？）
+
 如果使用純 docker run，我必須手動執行 docker network create、docker volume create，然後小心翼翼地輸入多條又長又醜的指令，還要手動去連結與確認環境變數順序。只要拼字或參數錯一個，整個架構就垮了。
 改用 compose.yaml 之後，「基礎設施即程式碼（IaC）」 的優勢非常有感！我只需要宣告好理想的狀態（服務、網路、掛載、依賴關係），一條 docker compose up -d 就幫我把整個叢集蓋好。最方便的是，Compose 會以目錄名稱為前綴（例如 w07_）自動建立獨立的 default 網路和 volume，完全不用擔心與其他專案的資源名稱衝突
 
@@ -39,8 +40,11 @@
 
 
 觀察（自己的話）：
+
 - 只用 depends_on：Docker 引擎聯絡機制不夠聰明，只要看到 db 容器進程（Process）一啟動，就誤以為它好了，立刻放行 app 起來營業。結果 App 去連線還在初始化睡覺的 DB 造成連線失敗，Flask 噴出 503 存取日誌。這在生產環境會讓使用者看到翻車畫面。
+
 - 改用 service_healthy 長語法：Docker Compose 會化身為嚴格的守門員，死死按住 app 不准它啟動，直到 db 內部的健康檢查指令 pg_isready 成功回傳為止。前幾秒因為 App 根本還沒起來、沒監聽 Port，所以連線是 000（拒絕連線）；等到第 9-10 秒 App 被安全放行後，使用者點進去直接就是最穩定的 200 ok，完美實現啟動。
+
 ## 排錯紀錄
 - 症狀：執行 sudo docker compose config 或啟動時系統崩潰，噴出語法錯誤：
 service "database" refers to undefined volume database-data: invalid compose project
