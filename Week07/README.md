@@ -1,6 +1,5 @@
 # W07｜Docker Compose 與資料持久化
 
-
 ## 拓樸圖
 （mermaid 或 ASCII，標出 app、db、default network、db-data volume）
 <img width="761" height="532" alt="w7" src="https://github.com/user-attachments/assets/79e0698c-62ad-465a-9aa8-c8c7af0f6a7a" />
@@ -12,7 +11,8 @@
 
 如果使用純 docker run，我必須手動執行 docker network create、docker volume create，然後小心翼翼地輸入多條又長又醜的指令，還要手動去連結與確認環境變數順序。只要拼字或參數錯一個，整個架構就垮了。
 改用 compose.yaml 之後，「基礎設施即程式碼（IaC）」 的優勢非常有感！我只需要宣告好理想的狀態（服務、網路、掛載、依賴關係），一條 docker compose up -d 就幫我把整個叢集蓋好。最方便的是，Compose 會以目錄名稱為前綴（例如 w07_）自動建立獨立的 default 網路和 volume，完全不用擔心與其他專案的資源名稱衝突
-
+<img width="333" height="576" alt="截圖 2026-06-03 21 50 19" src="https://github.com/user-attachments/assets/b7e40666-1112-410f-b139-37ddcdbfd316" />
+<img width="358" height="481" alt="截圖 2026-06-03 21 49 50" src="https://github.com/user-attachments/assets/4201b17f-f3c9-4869-bb31-f1e44cad9649" />
 
 ## 三種掛載對照
 | 掛載類型 | 路徑（host） | 容器砍重起資料還在嗎 | 重啟容器資料狀態 | 適合情境 |
