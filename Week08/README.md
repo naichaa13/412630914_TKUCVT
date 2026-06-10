@@ -38,6 +38,7 @@ app-1  | 127.0.0.1 - - [10/Jun/2026 09:43:46] "GET /healthz HTTP/1.1" 503 -
 | 4 | uid=1000(appuser) | `0000000000000000` | 1 | ok |
 
 <img width="686" height="631" alt="四階權限對照" src="https://github.com/user-attachments/assets/70e2653a-3fc7-4d81-8811-6acdc690964b" />
+
 ## 排錯紀錄
 - 症狀：`cat: write error: No space left on device`，compose.yaml 無法寫入
 - 診斷：noisy 容器無 rotation，30 秒噴出 9.6 GiB 撐爆磁碟，`df -h /` 顯示 Use% = 100%
