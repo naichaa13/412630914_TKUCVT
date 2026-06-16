@@ -1,4 +1,4 @@
-# 期末實作 — <學號> <姓名>
+# 期末實作 — <412630914> <許家禎>
 
 ## 1. 架構總覽
 <Mermaid 圖 + 一段話說明>
@@ -109,6 +109,17 @@ POSTGRES_PASSWORD=mysecretpassword
 <權限驗證輸出 + cgroup 讀值對照表>
 ### yaml 的值怎麼對回 cgroup 檔案？
 
+**1. 記憶體配額**：268435456 (對應 `memory: 256m`)
+記憶體限制在 `memory.max` 檔案中以 Byte 為單位記錄。
+* 計算公式：$Value (Bytes) = 256 \times 1024 \times 1024$
+* 數值意義：$256 \times 1024^2 = 268,435,456$ Bytes。這就是 Kernel 執行記憶體硬上限的絕對數值。
+**2. CPU 配額**：50000 100000 (對應 `cpus: "0.5"`)
+CPU 限制是透過 CFS (Completely Fair Scheduler) 的 **配額 (Quota)** 與 **週期 (Period)** 機制來執行的。`cpu.max` 檔案的格式為 `quota period`。
+* 預設週期 (Period)：Linux 預設排程週期為 $100,000$ 微秒 (即 $0.1$ 秒)。
+* 配額 (Quota)：容器在一個週期內允許使用的總運算時間（單位為微秒）。
+* 數值意義：
+* Quota (50,000)：代表容器在 $0.1$ 秒的週期內，最多只能使用 $0.05$ 秒的 CPU 時間。
+* 運算比率：$\frac{50,000}{100,000} = 0.5$。
 
 ![權限驗證輸出](screenshots/hardening-verify.png)
 
@@ -182,11 +193,13 @@ volumes:
 ### 故障 1：<F1>
 - 注入方式：docker compose stop db
 - 故障前：
+  
   1.指令：docker compose ps
   
   2.輸出：app Up (healthy), db Up (healthy)
   
 - 故障中：
+  
   1.指令：curl -v http://localhost:8080/healthz
   
   2.輸出：< HTTP/1.1 503 SERVICE UNAVAILABLE
@@ -194,6 +207,7 @@ volumes:
   3.容器狀態：app Up (unhealthy)
   
 - 回復後：
+  
   1.指令：docker compose start db 後等待 healthcheck 週期完成
   
   2.輸出：app Up (healthy)
@@ -207,6 +221,7 @@ volumes:
 - 注入方式：docker run --rm --memory 128m python:3.12-slim python -c "x = bytearray(256 * 1024 * 1024)"; echo "exit code = $?"
 - 故障前：環境資源正常，系統穩態。
 - 故障中：
+  
  1.輸出：exit code = 137 (即 128 + SIGKILL 9)
   
  2.Kernel 鑑定：sudo dmesg -T | grep -i "memory" 顯示 Memory cgroup out of memory:   Killed process。
@@ -220,12 +235,18 @@ volumes:
 ### 三症狀分層表（必答）
 | 症狀 | 最可能的層 | 第一條驗證命令 |
 | ---- | ---------- | -------------- |
-| timeout |  |  |
-| connection refused |  |  |
-| HTTP 503 |  |  |
+| timeout |網路層 (L3)| traceroute |
+| connection refused |傳輸層 (L4)|ss -tlnp|
+| HTTP 503 |應用層 (L7)|docker compose logs|
 
 ## 7. 反思（200 字）
 這學期從 VM 做到 production-ready 容器，「隔離」這個概念在 VM、namespace、
 cgroup、權限階梯四個地方各出現一次——它們在防的東西一樣嗎？
 
+這學期從 VM 到容器化的演練，讓我深刻體會到「隔離」並非單一技術，而是層層防禦的縱深結構：
+VM (硬體隔離)：防範底層核心受損，確保宿主機與應用程式的物理邊界。
+Namespace (視野隔離)：解決邏輯上的資源衝突，讓容器認為自己獨佔 OS，達成程序視角的獨立。
+Cgroup (資源隔離)：防禦資源耗竭攻击 (DoS)，嚴格限制 CPU 與記憶體配額，確保多容器共存時的穩定性。
+權限階梯 (身份隔離)：則是防禦權限提升 (Privilege Escalation)，透過強制非 root 執行與禁止提權，限制駭客在容器內的破壞力。
+這些機制防禦的對象完全不同：VM 防崩潰、Namespace 防干擾、Cgroup 防壟斷、權限階梯防惡意控制。它們並非重複勞動，而是共同構築了一個高韌性的系統。當我們將這些技術從理論應用到 Production-ready 環境時，不僅是為了部署服務，更是為了確保即使某個組件發生故障，威脅也能被侷限在最小範圍內
 ## 8. Bonus（選做）
