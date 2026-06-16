@@ -20,11 +20,15 @@ graph LR
 
 ## 2. Part A：底座與基準點
 <ssh 證據 + 版本 + snapshot>
-
+![ssh](screenshots/ssh-and-versions.png)
+<img width="520" height="535" alt="snapshot" src="https://github.com/user-attachments/assets/3209106d-5981-44ef-bd56-83275a8309ea" />
 
 ## 3. Part B：Dockerfile 與快取
 <Dockerfile + 兩次 build 對照>
+
+![兩次 build 對照](screenshots/build-cache-diff.png)
 ### 為什麼聽 8080 不聽 80？
+符合 Linux 安全規範，1024 以下為特權埠 (Privileged Ports)，綁定需 root 權限。為落實最小權限原則 (Least Privilege)，容器以 appuser (UID 1000) 執行，故選用 8080 埠以避免提權攻擊。
 
 ## 4. Part C：Compose 與資料持久化
 <compose.yaml 重點 + 三段對照>
