@@ -1,1 +1,28 @@
+# --- 環境敏感設定 (絕對不要上傳) ---
+.env
+.env.local
+.env.*.local
 
+# --- Python 快取與虛擬環境 ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# --- Docker 與系統快取 ---
+.docker/
+*tmp/
+*.log
+
+# --- IDE 設定 ---
+.vscode/
+.idea/
+.DS_Store
+
+# --- 資料庫備份 (避免誤傳) ---
+*.sql
+*.dump
