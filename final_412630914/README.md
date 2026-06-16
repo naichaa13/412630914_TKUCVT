@@ -25,14 +25,77 @@ graph LR
 
 ## 3. Part B：Dockerfile 與快取
 <Dockerfile + 兩次 build 對照>
-final_412630914/app/Dockerfile
+
+ **Dockerfile**
+```
+FROM python:3.12-slim
+
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+RUN chown -R appuser:appuser /app
+
+USER appuser
+EXPOSE 8080
+CMD ["python", "app.py"]
+```
+
+
+ **.dockerignore**
+```
+.env
+__pycache__
+*.pyc
+.git
+.gitignore
+```
 
 ![兩次 build 對照](screenshots/build-cache-diff.png)
+
 ### 為什麼聽 8080 不聽 80？
 符合 Linux 安全規範，1024 以下為特權埠 (Privileged Ports)，綁定需 root 權限。為落實最小權限原則 (Least Privilege)，容器以 appuser (UID 1000) 執行，故選用 8080 埠以避免提權攻擊。
 
 ## 4. Part C：Compose 與資料持久化
 <compose.yaml 重點 + 三段對照>
+
+ **compose.yaml重點**
+```
+services:
+  db:
+    image: postgres:16
+    volumes:
+      - db-data:/var/lib/postgresql/data  # 定義持久化卷
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  db-data:  # 宣告 Named Volume
+```
+
+ **.env.example**
+```
+POSTGRES_DB=examdb
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=mysecretpassword
+```
+   三段對照：
+
+   | 階段 | 命令 | `SELECT * FROM exam` 結果 |
+   | ---- | ---- | ------------------------- |
+   | 砍容器重建 | `docker compose down && docker compose up -d` | **還在** |
+   | 連 volume 一起砍 | `docker compose down -v && docker compose up -d` | **消失** |
+   | 重寫 | 再 INSERT 一次 | 重新出現 |
+   
+![三段對照](screenshots/volume-3-stages.png)
+
 ### down vs down -v
 - docker compose down：僅停止並刪除容器與網路，但 Named Volume 會保留，資料持久化。
   
@@ -46,16 +109,113 @@ final_412630914/app/Dockerfile
 <權限驗證輸出 + cgroup 讀值對照表>
 ### yaml 的值怎麼對回 cgroup 檔案？
 
-## 6. Part E：故障演練
-### 故障 1：<F1–F4 擇一>
-- 注入方式：
-- 故障前：
-- 故障中：
-- 回復後：
-- 診斷推論：
 
-### 故障 2：<另一個>
-（同上）
+![權限驗證輸出](screenshots/hardening-verify.png)
+
+![cgroup](screenshots/cgroup.png)
+
+**最終版 compose.yaml**
+```
+services:
+  app:
+    build: .
+    restart: always
+    environment:
+      DB_HOST: db
+    # 資源上限
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.5"
+        pids: 200
+    # 權限加固
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # 健康檢查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  db:
+    image: postgres:16
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: "0.5"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+```
+
+## 6. Part E：故障演練
+### 故障 1：<F1>
+- 注入方式：docker compose stop db
+- 故障前：
+  1.指令：docker compose ps
+  
+  2.輸出：app Up (healthy), db Up (healthy)
+  
+- 故障中：
+  1.指令：curl -v http://localhost:8080/healthz
+  
+  2.輸出：< HTTP/1.1 503 SERVICE UNAVAILABLE
+  
+  3.容器狀態：app Up (unhealthy)
+  
+- 回復後：
+  1.指令：docker compose start db 後等待 healthcheck 週期完成
+  
+  2.輸出：app Up (healthy)
+  
+- 診斷推論：本演練證明了 unhealthy ≠ dead。當資料庫層 (DB) 斷線，應用程式雖仍在執行，但透過 healthcheck 機制主動感知依賴異常，回傳 503 錯誤。這保護了前端監控層，防止無效請求繼續湧入。
+![前](screenshots/fault-A-before.png)
+![中](screenshots/fault-A-during.png)
+![後](screenshots/fault-A-after.png)
+
+### 故障 2：<F3>
+- 注入方式：docker run --rm --memory 128m python:3.12-slim python -c "x = bytearray(256 * 1024 * 1024)"; echo "exit code = $?"
+- 故障前：環境資源正常，系統穩態。
+- 故障中：
+ 1.輸出：exit code = 137 (即 128 + SIGKILL 9)
+  
+ 2.Kernel 鑑定：sudo dmesg -T | grep -i "memory" 顯示 Memory cgroup out of memory:   Killed process。
+- 回復後：降額配置請求 (64MB) 執行成功 (exit code = 0)。
+- 診斷推論：驗證了 Linux Kernel 的 OOM Killer 機制。當容器資源配置 (Cgroup) 被強制限制時，Kernel 為保護主機記憶體不被單一進程耗盡，會採取強制 SIGKILL 終止該進程。
+
+![前](screenshots/fault-B-before.png)
+![中](screenshots/fault-B-during.png)
+![後](screenshots/fault-B-after.png)
 
 ### 三症狀分層表（必答）
 | 症狀 | 最可能的層 | 第一條驗證命令 |
