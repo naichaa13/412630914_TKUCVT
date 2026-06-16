@@ -2,9 +2,25 @@
 
 ## 1. 架構總覽
 <Mermaid 圖 + 一段話說明>
+```mermaid
+graph LR
+    User[User/Browser] -->|8080| App[Flask App Container]
+    App -->|Internal| DB[(PostgreSQL Container)]
+    App -.->|Healthcheck| DB
+    subgraph Docker Network
+    App
+    DB
+    end
+    subgraph Volumes
+    DB_Data[db-data]
+    end
+    DB --- DB_Data
+```
+採用 Flask 應用程式作為前端，PostgreSQL 作為資料存儲，透過 Docker Compose 定義容器間橋接網路 (bridge network) 與深度健康檢查 (deep healthcheck) 機制，實現服務相依性的邏輯隔離與自動化自癒能力。
 
 ## 2. Part A：底座與基準點
 <ssh 證據 + 版本 + snapshot>
+
 
 ## 3. Part B：Dockerfile 與快取
 <Dockerfile + 兩次 build 對照>
