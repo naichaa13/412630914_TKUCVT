@@ -222,9 +222,9 @@ volumes:
 - 故障前：環境資源正常，系統穩態。
 - 故障中：
   
- 1.輸出：exit code = 137 (即 128 + SIGKILL 9)
+  1.輸出：exit code = 137 (即 128 + SIGKILL 9)
   
- 2.Kernel 鑑定：sudo dmesg -T | grep -i "memory" 顯示 Memory cgroup out of memory:   Killed process。
+  2.Kernel 鑑定：sudo dmesg -T | grep -i "memory" 顯示 Memory cgroup out of memory:     Killed process。
 - 回復後：降額配置請求 (64MB) 執行成功 (exit code = 0)。
 - 診斷推論：驗證了 Linux Kernel 的 OOM Killer 機制。當容器資源配置 (Cgroup) 被強制限制時，Kernel 為保護主機記憶體不被單一進程耗盡，會採取強制 SIGKILL 終止該進程。
 
