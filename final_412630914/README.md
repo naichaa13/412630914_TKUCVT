@@ -25,6 +25,7 @@ graph LR
 
 ## 3. Part B：Dockerfile 與快取
 <Dockerfile + 兩次 build 對照>
+final_412630914/app/Dockerfile
 
 ![兩次 build 對照](screenshots/build-cache-diff.png)
 ### 為什麼聽 8080 不聽 80？
