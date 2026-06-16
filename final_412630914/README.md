@@ -13,6 +13,12 @@
 ## 4. Part C：Compose 與資料持久化
 <compose.yaml 重點 + 三段對照>
 ### down vs down -v
+- docker compose down：僅停止並刪除容器與網路，但 Named Volume 會保留，資料持久化。
+  
+- docker compose down -v：除了停止容器外，會連同 volumes 區塊定義的 Named Volume 一併抹除。這是一個破壞性的刪除動作。
+
+**Named Volume 的生命週期：**
+其生命週期獨立於容器。它不會因為容器被停止或移除而消失，只有在被顯式刪除 (docker volume rm) 或使用 down -v 時才會被回收。這保證了資料庫在容器重啟時不會丟失資料。
 
 ## 5. Part D：生產化加固
 <權限驗證輸出 + cgroup 讀值對照表>
